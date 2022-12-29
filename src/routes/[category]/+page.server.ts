@@ -26,7 +26,7 @@ export const load: PageLoad = (async ({ params, depends }) => {
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-  default: async ({ request }) => {
+  create: async ({ request }) => {
     const data = await request.formData();
 
     await prisma.card.create({
@@ -41,6 +41,16 @@ export const actions = {
       },
     });
 
+    return { success: true };
+  },
+
+  delete: async ({ request, params }) => {
+    const data = await request.formData();
+    await prisma.card.delete({
+      where: {
+        id: data.get("id"),
+      },
+    });
     return { success: true };
   },
 };

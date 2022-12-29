@@ -1,4 +1,14 @@
 <a href="/">Home</a>
 
-<hr/>
-<slot/>
+<hr />
+
+<div class="wrapper">
+  <slot />
+</div>
+
+<style>
+  /* .wrapper {
+    display: flex;
+    flex-direction: column;
+  } */
+</style>

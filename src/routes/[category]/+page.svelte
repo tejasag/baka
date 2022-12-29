@@ -5,9 +5,7 @@
   /** @type {import('./$types').PageData}*/
   export let data: PageData;
 
-  const submit = () => {
-    invalidate("app:cards");
-  };
+  const submit = () => invalidate("app:cards");
 
   function shuffle<T>(array: T[]): T[] {
     let ar = [...array];
@@ -30,8 +28,6 @@
     }))
   );
 
-  console.log(cards);
-
   let curr = 0;
   const next = () => ((flipped = false), (curr = (curr + 1) % cards.length));
   const back = () => {
@@ -40,25 +36,32 @@
     if (curr < 0) curr = cards.length - 1;
   };
 
-  // const flip = () => {
-  //   const card = document.querySelector(".card");
-  //   if (card) {
-  //     card.classList.toggle("flipped");
-  //     card.innerHTML = card?.classList.contains("flipped")
-  //       ? cards[curr].a
-  //       : cards[curr].q;
-  //   }
-  // };
-
   const flip = () => (flipped = !flipped);
-
   let flipped = false;
-  $: text = cards[curr][flipped ? "a" : "q"];
+  $: text = cards.length > 0 && cards[curr][flipped ? "a" : "q"];
+
+  const deleteCard = async (index) => {
+    console.log("uwu");
+    if (confirm("Are you sure you want to delete this card?")) {
+      await fetch("?/delete", {
+        method: "POST",
+        body: new URLSearchParams({
+          id: data.props.cards[curr].id,
+        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      invalidate("app:cards");
+    } else alert("Cancelled");
+    console.log(cards);
+  };
 </script>
 
 Create card
 
-<form method="POST">
+<form method="POST" action="?/create">
   <label>
     Name
     <input name="name" />
@@ -76,13 +79,23 @@ Create card
 
 <hr />
 
-<div on:click={flip} class="card">
-  {flipped} : {text}
-</div>
-
-<button on:click={back}>back</button>
-{curr + 1}/{cards.length}
-<button on:click={next}>next</button>
+{#if cards.length > 0}
+  <div
+    on:click={flip}
+    on:keyup={undefined}
+    class="card"
+    style:background-color={flipped ? "#ffc2c2" : "#c2ffff"}
+  >
+    {!flipped ? "question" : "answer"}: <br />
+    {text}
+  </div>
+  <button on:click={() => deleteCard(curr)}>delete</button>
+  <button on:click={back}>back</button>
+  {curr + 1}/{cards.length}
+  <button on:click={next}>next</button>
+{:else}
+  <div>no cards</div>
+{/if}
 
 <style>
   .card {
@@ -92,11 +105,6 @@ Create card
     margin: 3rem;
     perspective: 1000px;
     border-radius: 20px;
-    background: #ffffff;
     box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
-  }
-
-  .flipped {
-    background: #1d1d1d;
   }
 </style>

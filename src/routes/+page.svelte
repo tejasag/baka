@@ -16,7 +16,13 @@
 
   const deleteCat = async (index) => {
     const cat = data.categories[index];
-    if (confirm("Are you sure you want to delete " + cat.name + "?")) {
+    if (
+      prompt(
+        "Are you sure you want to delete " +
+          cat.name +
+          " and all it's cards? type 'yes' to confirm"
+      ) === "yes"
+    ) {
       await fetch(`?/delete`, {
         method: "POST",
         headers: {
@@ -32,24 +38,29 @@
   };
 </script>
 
-Create category
+<div class="form">
+  <h1>Create category</h1>
 
-<form method="POST" action="?/create">
-  <label>
-    Name
-    <input bind:value={cat} name="name" />
-  </label>
-  <button on:click={submit}>Create</button>
-</form>
-{#if form?.success}
-  Done! created {cat}
-{/if}
+  <form method="POST" action="?/create">
+    <label>
+      Name
+      <input bind:value={cat} name="name" />
+    </label>
+    <button on:click={submit}>Create</button>
+  </form>
+  {#if form?.success}
+    Done! created {cat}
+  {/if}
+</div>
 
 <hr />
 
-{#each data.categories as category, index}
-  <div>
-    <a href={`/${category.name}`}>{category.name}</a>
-    <button on:click={() => deleteCat(index)}>delete</button>
-  </div>
-{/each}
+<div class="cards">
+  <h1>Categories</h1>
+  {#each data.categories as category, index}
+    <div>
+      <a href={`/${category.name}`}>{category.name}</a>
+      <button on:click={() => deleteCat(index)}>delete</button>
+    </div>
+  {/each}
+</div>
